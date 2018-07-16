@@ -469,10 +469,10 @@ muc_process_iq(IQ, _MUCState) ->
     IQ.
 
 parse_query(#mam_query{xmlns = ?NS_MAM_TMP,
-		       start = Start, 'end' = End,
+		       start = Start, 'end' = End, thread = Thread,
 		       with = With, withtext = Text}, _Lang) ->
     {ok, [{start, Start}, {'end', End},
-	  {with, With}, {withtext, Text}]};
+	  {with, With}, {withtext, Text}, {thread, Thread}]};
 parse_query(#mam_query{xdata = #xdata{}} = Query, Lang) ->
     X = xmpp_util:set_xdata_field(
 	  #xdata_field{var = <<"FORM_TYPE">>,

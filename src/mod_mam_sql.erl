@@ -90,7 +90,7 @@ delete_old_messages(ServerHost, TimeStamp, Type) ->
     ok.
 
 extended_fields() ->
-    [{withtext, <<"">>}].
+    [{withtext, <<"">>}, {thread, <<"">>}].
 
 store(Pkt, LServer, {LUser, LHost}, Type, Peer, Nick, _Dir, TS) ->
     SUser = case Type of
@@ -104,6 +104,7 @@ store(Pkt, LServer, {LUser, LHost}, Type, Peer, Nick, _Dir, TS) ->
 	      jid:tolower(Peer)),
     XML = fxml:element_to_binary(Pkt),
     Body = fxml:get_subtag_cdata(Pkt, <<"body">>),
+    Thread = fxml:get_subtag_cdata(Pkt, <<"thread">>),
     SType = misc:atom_to_binary(Type),
     case ejabberd_sql:sql_query(
            LServer,
@@ -117,6 +118,7 @@ store(Pkt, LServer, {LUser, LHost}, Type, Peer, Nick, _Dir, TS) ->
                "xml=%(XML)s",
                "txt=%(Body)s",
                "kind=%(SType)s",
+               "thread=%(Thread)s",
                "nick=%(Nick)s"])) of
 	{updated, _} ->
 	    ok;
@@ -273,6 +275,7 @@ make_sql_query(User, LServer, MAMQuery, RSM) ->
     End = proplists:get_value('end', MAMQuery),
     With = proplists:get_value(with, MAMQuery),
     WithText = proplists:get_value(withtext, MAMQuery),
+    Thread = proplists:get_value(thread, MAMQuery),
     {Max, Direction, ID} = get_max_direction_id(RSM),
     ODBCType = ejabberd_config:get_option({sql_type, LServer}),
     Escape =
@@ -294,6 +297,12 @@ make_sql_query(User, LServer, MAMQuery, RSM) ->
     WithTextClause = if is_binary(WithText), WithText /= <<>> ->
 			     [<<" and match (txt) against ('">>,
 			      Escape(WithText), <<"')">>];
+			true ->
+			     []
+		     end,
+		ThreadClause = if is_binary(Thread), Thread /= <<>> ->
+			     [<<" thread='">>,
+			      Escape(Thread), <<"')">>];
 			true ->
 			     []
 		     end,
@@ -347,13 +356,13 @@ make_sql_query(User, LServer, MAMQuery, RSM) ->
                   " FROM archive WHERE username='">>,
                  SUser, <<"' and server_host='">>,
                  SServer, <<"'">>, WithClause, WithTextClause,
-                 StartClause, EndClause, PageClause];
+                 ThreadClause, StartClause, EndClause, PageClause];
             false ->
                 [<<"SELECT ">>, TopClause,
                  <<" timestamp, xml, peer, kind, nick"
                   " FROM archive WHERE username='">>,
                  SUser, <<"'">>, WithClause, WithTextClause,
-                 StartClause, EndClause, PageClause]
+								 ThreadClause, StartClause, EndClause, PageClause]
         end,
 
     QueryPage =
@@ -375,12 +384,12 @@ make_sql_query(User, LServer, MAMQuery, RSM) ->
              [<<"SELECT COUNT(*) FROM archive WHERE username='">>,
               SUser, <<"' and server_host='">>,
               SServer, <<"'">>, WithClause, WithTextClause,
-              StartClause, EndClause, <<";">>]};
+							ThreadClause, StartClause, EndClause, <<";">>]};
         false ->
             {QueryPage,
              [<<"SELECT COUNT(*) FROM archive WHERE username='">>,
               SUser, <<"'">>, WithClause, WithTextClause,
-              StartClause, EndClause, <<";">>]}
+							ThreadClause, StartClause, EndClause, <<";">>]}
     end.
 
 -spec get_max_direction_id(rsm_set() | undefined) ->
