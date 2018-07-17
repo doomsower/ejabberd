@@ -10,7 +10,7 @@
 -include("logger.hrl").
 -include("xmpp.hrl").
 
-offline_message(#message{to = To, from = From, body = Body} = Acc) ->
+offline_message({_Action, #message{to = To, from = From, body = Body}} = Acc) ->
   ToResource = To#jid.lresource,
   FromUser = From#jid.luser,
   Message = xmpp:get_text(Body),
