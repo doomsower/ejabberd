@@ -4,7 +4,7 @@
 
 %% gen_mod API callbacks
 -export([start/2, stop/1, reload/3, depends/2]).
--export([offline_message_hook/1]).
+-export([offline_message/1]).
 
 %% Required by ?INFO_MSG macros
 -include("logger.hrl").
