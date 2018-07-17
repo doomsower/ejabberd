@@ -13,6 +13,7 @@
 start(Host, _Opts) ->
   ?INFO_MSG("mod_fcm staring...", []),
   FcmKey = os:getenv("FCM_KEY"),
+  fcm_app:start(normal, []),
   ?INFO_MSG("mod_fcm key = ~s", [FcmKey]),
   %% mod_mam has priority of 50
   ejabberd_hooks:add(offline_message_hook, Host, ?MODULE, offline_message_hook, 60),
