@@ -16,7 +16,7 @@ start(Host, _Opts) ->
   fcm_app:start(normal, []),
   ?INFO_MSG("mod_fcm key = ~s", [FcmKey]),
   %% mod_mam, mod_offline have priority of 50
-  ejabberd_hooks:add(offline_message_hook, Host, ?MODULE, offline_message_hook, 50),
+  ejabberd_hooks:add(store_offline_message, Host, ?MODULE, offline_message_hook, 50),
   ?INFO_MSG("mod_fcm added offline hook", []),
   fcm:start(swapp_fcm, FcmKey),
   ?INFO_MSG("mod_fcm started", []),
@@ -40,7 +40,7 @@ offline_message_hook({_Action, #message{to = To, from = From, body = Body}} = Ac
 
 stop(Host) ->
   ?INFO_MSG("mod_fcm stoping...", []),
-  ejabberd_hooks:delete(offline_message_hook, Host, ?MODULE, offline_message_hook, 50),
+  ejabberd_hooks:delete(store_offline_message, Host, ?MODULE, offline_message_hook, 50),
   ?INFO_MSG("mod_fcm stopping fcm service...", []),
   fcm:stop(swapp_fcm),
   ?INFO_MSG("mod_fcm stopped", []),
