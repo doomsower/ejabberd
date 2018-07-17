@@ -98,6 +98,7 @@ CREATE TABLE archive (
     id SERIAL,
     kind text,
     nick text,
+    thread VARCHAR(36) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now()
 );
 
@@ -105,6 +106,7 @@ CREATE INDEX i_username_timestamp ON archive USING btree (username, timestamp);
 CREATE INDEX i_username_peer ON archive USING btree (username, peer);
 CREATE INDEX i_username_bare_peer ON archive USING btree (username, bare_peer);
 CREATE INDEX i_timestamp ON archive USING btree (timestamp);
+CREATE INDEX i_thread ON archive (thread);
 
 CREATE TABLE archive_prefs (
     username text NOT NULL PRIMARY KEY,
