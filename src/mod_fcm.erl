@@ -25,7 +25,7 @@ start(Host, _Opts) ->
 offline_message_hook({_Action, #message{to = To, from = From, body = Body}} = Acc) ->
   ToResource = To#jid.lresource,
   FromUser = From#jid.luser,
-  Message = Body#text.data,
+  Message = xmpp:get_text(Body),
   ?INFO_MSG("mod_fcm pushing, '~s' from '~s' to '~s'", [Message, FromUser, ToResource]),
   fcm:push(swapp_fcm, [ToResource], [{<<"data">>, [{<<"message">>, Message}]}]),
   ?INFO_MSG("mod_fcm pushed, '~s' from '~s' to '~s'", [Message, FromUser, ToResource]),
