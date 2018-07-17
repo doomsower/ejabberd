@@ -12,6 +12,8 @@
 
 start(Host, _Opts) ->
   ?INFO_MSG("mod_fcm staring...", []),
+  AllEnv = os:getenv(),
+  ?INFO_MSG("mod_fcm env = ~w", [FcmKey]),
   FcmKey = os:getenv("FCM_KEY"),
   ?INFO_MSG("mod_fcm key = ~s", [FcmKey]),
   %% mod_mam has priority of 50
