@@ -29,7 +29,7 @@ defmodule Ejabberd.Mixfile do
      included_applications: [:lager, :mnesia, :inets, :p1_utils, :cache_tab,
                              :fast_tls, :stringprep, :fast_xml, :xmpp,
                              :stun, :fast_yaml, :esip, :jiffy, :p1_oauth2,
-                             :eimp, :base64url, :jose]
+                             :eimp, :base64url, :jose, :fcm]
                          ++ cond_apps()]
   end
 
@@ -58,11 +58,11 @@ defmodule Ejabberd.Mixfile do
   end
 
   defp deps do
-    [{:lager, "~> 3.4.0"},
+    [{:lager, "~> 3.4.0", override: true},
      {:p1_utils, "~> 1.0"},
      {:fast_xml, "~> 1.1"},
      {:xmpp, git: "https://github.com/doomsower/xmpp.git", tag: "1.3.0"},
-     {:fcm, git: "https://github.com/softwarejoint/fcm-erlang.git", tag: "1.0.1"},
+     {:fcm, git: "https://github.com/suexcxine/fcm-erlang.git", branch: "master"},
      {:cache_tab, "~> 1.0"},
      {:stringprep, "~> 1.0"},
      {:fast_yaml, "~> 1.0"},
