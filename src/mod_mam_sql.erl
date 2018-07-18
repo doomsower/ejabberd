@@ -302,7 +302,7 @@ make_sql_query(User, LServer, MAMQuery, RSM) ->
 		     end,
 		ThreadClause = if is_binary(Thread), Thread /= <<>> ->
 			     [<<" and thread='">>,
-			      Escape(Thread), <<"')">>];
+			      Escape(Thread), <<"'">>];
 			true ->
 			     []
 		     end,
