@@ -29,6 +29,21 @@ adhoc_commands(Acc, _From, _To, Request) ->
   ?INFO_MSG("mod_fcm adhoc_commands 2,  : ~p", [Request]),
   Acc.
 
+sm_commands(Acc, From, To, #adhoc_command{node = Command, action = execute, xdata = XData} = Req) ->
+  Host = To#jid.lserver,
+  ?INFO_MSG("mod_fcm sm_commands, ~s", [Command]),
+  Result = adhoc_perform_action(Host, Command, From, XData),
+  ?INFO_MSG("mod_fcm sm_commands result, ~s : ~p", [Command, Result]),
+
+  case Result of
+    unknown -> Acc;
+    {error, Error} -> {error, Error};
+
+    ok ->
+      xmpp_util:make_adhoc_response(Req, #adhoc_command{status = completed})
+
+  end;
+
 sm_commands(Acc, _From, _To, Request) ->
   ?INFO_MSG("mod_fcm sm_commands 2,  : ~p", [Request]),
   Acc.
