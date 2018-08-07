@@ -13,12 +13,7 @@
 
 adhoc_commands(Acc, From, To, #adhoc_command{node = Command, action = execute, xdata = XData} = Req) ->
   Host = To#jid.lserver,
-  Access = gen_mod:get_module_opt(Host, ?MODULE, access_backends,
-    fun(A) when is_atom(A) -> A end, all),
-  Result = case acl:match_rule(Host, Access, From) of
-             deny -> {error, xmpp:err_forbidden()};
-             allow -> adhoc_perform_action(Host, Command, From, XData)
-           end,
+  Result = adhoc_perform_action(Host, Command, From, XData),
 
   case Result of
     unknown -> Acc;
