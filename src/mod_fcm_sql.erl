@@ -16,7 +16,7 @@ register_user(LServer, User, Nick, Token) ->
          "VALUES (%(User)s, %(Nick)s, '{}'::text[] || %(Token)s::text) "
          "ON CONFLICT (username) DO UPDATE SET "
          "nick = EXCLUDED.nick, "
-         "tokens = insert_unique(tokens, %(Token)s)")) of
+         "tokens = insert_unique(push_info.tokens, %(Token)s::text)")) of
     {error, Reason} -> {error, Reason};
     _ -> ok
   end.
