@@ -14,7 +14,7 @@ register_user(LServer, User, Nick, Token) ->
   case ejabberd_sql:sql_query(LServer,
     ?SQL("INSERT INTO push_info(username, nick, tokens) "
          "VALUES (%(User)s, %(Nick)s, '{}'::text[] || %(Token)s::text) "
-         "ON CONFLICT DO UPDATE SET "
+         "ON CONFLICT (username) DO UPDATE SET "
          "nick = EXCLUDED.nick, "
          "tokens = insert_unique(tokens, %(Token)s)")) of
     {error, Reason} -> {error, Reason};
