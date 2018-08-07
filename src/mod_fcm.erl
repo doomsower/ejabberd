@@ -29,25 +29,6 @@ adhoc_commands(Acc, _From, _To, Request) ->
   ?INFO_MSG("mod_fcm adhoc_commands 2,  : ~p", [Request]),
   Acc.
 
-sm_commands(Acc, From, To, #adhoc_command{node = Command, action = execute, xdata = XData} = Req) ->
-  Host = To#jid.lserver,
-  ?INFO_MSG("mod_fcm sm_commands, ~s", [Command]),
-  Result = adhoc_perform_action(Host, Command, From, XData),
-  ?INFO_MSG("mod_fcm sm_commands result, ~s : ~p", [Command, Result]),
-
-  case Result of
-    unknown -> Acc;
-    {error, Error} -> {error, Error};
-
-    ok ->
-      xmpp_util:make_adhoc_response(Req, #adhoc_command{status = completed})
-
-  end;
-
-sm_commands(Acc, _From, _To, Request) ->
-  ?INFO_MSG("mod_fcm sm_commands 2,  : ~p", [Request]),
-  Acc.
-
 adhoc_perform_action(Host, <<"register-push-user">>, #jid{luser = User}, XData) ->
   FNick = xmpp_util:get_xdata_values(<<"nick">>, XData),
   FToken = xmpp_util:get_xdata_values(<<"token">>, XData),
@@ -101,7 +82,6 @@ start(Host, _Opts) ->
   %% mod_push has priority of 50
   ejabberd_hooks:add(offline_message_hook, Host, ?MODULE, offline_message, 45),
   ejabberd_hooks:add(adhoc_local_commands, Host, ?MODULE, adhoc_commands, 45),
-  ejabberd_hooks:add(adhoc_sm_commands, Host, ?MODULE, sm_commands, 45),
   ?INFO_MSG("mod_fcm added offline hook", []),
   fcm:start(swapp_fcm, FcmKey),
   ?INFO_MSG("mod_fcm started", []),
@@ -111,7 +91,6 @@ stop(Host) ->
   ?INFO_MSG("mod_fcm stoping...", []),
   ejabberd_hooks:delete(offline_message_hook, Host, ?MODULE, offline_message, 45),
   ejabberd_hooks:delete(adhoc_local_commands, Host, ?MODULE, adhoc_commands, 45),
-  ejabberd_hooks:delete(adhoc_sm_commands, Host, ?MODULE, sm_commands, 45),
   ?INFO_MSG("mod_fcm stopping fcm service...", []),
   fcm:stop(swapp_fcm),
   ?INFO_MSG("mod_fcm stopped", []),
