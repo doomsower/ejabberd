@@ -122,6 +122,21 @@ CREATE TABLE vcard (
     created_at TIMESTAMP NOT NULL DEFAULT now()
 );
 
+CREATE TABLE push_info (
+  username text PRIMARY KEY,
+  tokens   text[] NOT NULL DEFAULT ARRAY[]::text[],
+  nick     text,
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);
+
+CREATE OR REPLACE FUNCTION insert_unique(arr text[], item text)
+  RETURNS text[] AS
+$$
+BEGIN
+  RETURN (SELECT ARRAY( select distinct unnest(item || arr) ) )
+END
+$$ LANGUAGE 'plpgsql';
+
 CREATE TABLE vcard_search (
     username text NOT NULL,
     lusername text PRIMARY KEY,
