@@ -13,7 +13,9 @@
 
 adhoc_commands(Acc, From, To, #adhoc_command{node = Command, action = execute, xdata = XData} = Req) ->
   Host = To#jid.lserver,
+  ?INFO_MSG("mod_fcm adhoc_commands, ~s", [Command]),
   Result = adhoc_perform_action(Host, Command, From, XData),
+  ?INFO_MSG("mod_fcm adhoc_commands result, ~s : ~p", [Command, Result]),
 
   case Result of
     unknown -> Acc;
@@ -78,7 +80,7 @@ start(Host, _Opts) ->
   ?INFO_MSG("mod_fcm key = ~s", [FcmKey]),
   %% mod_push has priority of 50
   ejabberd_hooks:add(offline_message_hook, Host, ?MODULE, offline_message, 45),
-  ejabberd_hooks:add(adhoc_local_commands, Host, ?MODULE, adhoc_commands, 75),
+  ejabberd_hooks:add(adhoc_local_commands, Host, ?MODULE, adhoc_commands, 45),
   ?INFO_MSG("mod_fcm added offline hook", []),
   fcm:start(swapp_fcm, FcmKey),
   ?INFO_MSG("mod_fcm started", []),
@@ -87,7 +89,7 @@ start(Host, _Opts) ->
 stop(Host) ->
   ?INFO_MSG("mod_fcm stoping...", []),
   ejabberd_hooks:delete(offline_message_hook, Host, ?MODULE, offline_message, 45),
-  ejabberd_hooks:delete(adhoc_local_commands, Host, ?MODULE, adhoc_commands, 75),
+  ejabberd_hooks:delete(adhoc_local_commands, Host, ?MODULE, adhoc_commands, 45),
   ?INFO_MSG("mod_fcm stopping fcm service...", []),
   fcm:stop(swapp_fcm),
   ?INFO_MSG("mod_fcm stopped", []),
