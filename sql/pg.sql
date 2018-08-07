@@ -142,7 +142,7 @@ BEGIN
   RETURN result;
 END
 $$
-LANGUAGE 'plpgsql'
+LANGUAGE 'plpgsql';
 
 CREATE TABLE vcard_search (
     username text NOT NULL,
