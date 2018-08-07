@@ -132,10 +132,17 @@ CREATE TABLE push_info (
 CREATE OR REPLACE FUNCTION insert_unique(arr text[], item text)
   RETURNS text[] AS
 $$
+DECLARE
+  result text[];
 BEGIN
-  RETURN (SELECT ARRAY( select distinct unnest(item || arr) ) )
+  IF (item = '') IS NOT FALSE THEN
+    RETURN arr;
+  END IF;
+  SELECT ARRAY( select distinct unnest(item || arr) ) into result;
+  RETURN result;
 END
-$$ LANGUAGE 'plpgsql';
+$$
+LANGUAGE 'plpgsql'
 
 CREATE TABLE vcard_search (
     username text NOT NULL,
