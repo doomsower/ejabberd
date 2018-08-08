@@ -64,8 +64,9 @@ offline_message({_, #message{to = To, from = From, body = Body, thread = Thread}
   ?INFO_MSG("mod_fcm push info: '~p'", [Info]),
 
   case Info of
-    {selected, [SenderNick, ReceiverTokens]} ->
-      send_notification(string:split(ReceiverTokens, <<",">>, all), Message, SenderNick, Thread, FromUser);
+    {selected, [{SenderNick, ReceiverTokens}]} ->
+      Tokens = string:split(ReceiverTokens, <<",">>, all),
+      send_notification(Tokens, Message, SenderNick, Thread, FromUser);
     _ -> ok
   end,
 
