@@ -51,5 +51,5 @@ unregister_token(LServer, User, Token) ->
 get_push_data(LServer, From, To) ->
   ejabberd_sql:sql_query(LServer,
     ?SQL("SELECT "
-         "(SELECT nick FROM push_info WHERE username = %(From)s) as nick "
+         "(SELECT nick FROM push_info WHERE username = %(From)s) as nick, "
          "(SELECT tokens FROM push_info WHERE username = %(To)s) as tokens")).
