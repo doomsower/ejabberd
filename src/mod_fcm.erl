@@ -25,8 +25,7 @@ adhoc_commands(Acc, From, To, #adhoc_command{node = Command, action = execute, x
       xmpp_util:make_adhoc_response(Req, #adhoc_command{status = completed})
 
   end;
-adhoc_commands(Acc, _From, _To, Request) ->
-  ?INFO_MSG("mod_fcm adhoc_commands 2,  : ~p", [Request]),
+adhoc_commands(Acc, _From, _To, _Request) ->
   Acc.
 
 adhoc_perform_action(Host, <<"register-push-user">>, #jid{luser = User}, XData) ->
