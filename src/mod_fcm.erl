@@ -73,7 +73,7 @@ offline_message({_, #message{to = To, from = From, body = Body, thread = Thread}
   Acc.
 
 send_notification([], Message, Title, Thread, Tag) ->
-  ?INFO_MSG("mod_fcm no tokens found", []).
+  ?INFO_MSG("mod_fcm no tokens found", []);
 
 send_notification(Tokens, Message, Title, Thread, Tag) ->
   fcm:push(
