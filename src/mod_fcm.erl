@@ -13,9 +13,9 @@
 
 adhoc_commands(Acc, From, To, #adhoc_command{node = Command, action = execute, xdata = XData} = Req) ->
   Host = To#jid.lserver,
-  ?DEBUG("mod_fcm adhoc_commands, ~s", [Command]),
+  ?INFO_MSG("mod_fcm adhoc_commands, ~s", [Command]),
   Result = adhoc_perform_action(Host, Command, From, XData),
-  ?DEBUG("mod_fcm adhoc_commands result, ~s : ~p", [Command, Result]),
+  ?INFO_MSG("mod_fcm adhoc_commands result, ~s : ~p", [Command, Result]),
 
   case Result of
     unknown -> Acc;
@@ -60,9 +60,10 @@ offline_message({_, #message{to = To, from = From, body = Body, thread = Message
   Host = To#jid.lserver,
   Message = xmpp:get_text(Body),
   Thread = MessageThread#message_thread.data,
+  ?INFO_MSG("mod_fcm offline message: '~s' (~s) from ~s to ~s", [Message, Thread, FromUser, ToUser]),
   Info = mod_fcm_sql:get_push_data(Host, FromUser, ToUser),
 
-  ?DEBUG("mod_fcm push info: '~p'", [Info]),
+  ?INFO_MSG("mod_fcm push info: '~p'", [Info]),
 
   case Info of
     {selected, [{SenderNick, ReceiverTokens}]} ->
@@ -74,7 +75,7 @@ offline_message({_, #message{to = To, from = From, body = Body, thread = Message
   Acc.
 
 send_notification([], _, _, _, _) ->
-  ?DEBUG("mod_fcm no tokens found", []);
+  ?INFO_MSG("mod_fcm no tokens found", []);
 
 send_notification(Tokens, Message, Title, Thread, Tag) ->
   fcm:push(
@@ -98,7 +99,7 @@ send_notification(Tokens, Message, Title, Thread, Tag) ->
       {<<"priority">>, <<"high">>}
     ]
   ),
-  ?DEBUG("mod_fcm sent from ~s (~s) to ~p message '~s' (~s)", [Title, Tag, Tokens, Message, Thread]).
+  ?INFO_MSG("mod_fcm sent from ~s (~s) to ~p message '~s' (~s)", [Title, Tag, Tokens, Message, Thread]).
 
 start(Host, _Opts) ->
   ?INFO_MSG("mod_fcm staring...", []),
