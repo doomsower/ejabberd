@@ -55,24 +55,49 @@ adhoc_perform_action(Host, <<"unregister-push-token">>, #jid{luser = User}, XDat
     _ -> {error, xmpp:err_bad_request()}
   end.
 
-offline_message({_, #message{to = To, from = From, body = Body}} = Acc) ->
-  ToResource = To#jid.lresource,
+offline_message({_, #message{to = To, from = From, body = Body, thread = Thread}} = Acc) ->
   FromUser = From#jid.luser,
   ToUser = To#jid.luser,
   Host = To#jid.lserver,
   Message = xmpp:get_text(Body),
-  ?INFO_MSG("mod_fcm pushing, '~s' from '~s' to '~s'", [Message, FromUser, ToResource]),
   Info = mod_fcm_sql:get_push_data(Host, FromUser, ToUser),
+
   ?INFO_MSG("mod_fcm push info: '~p'", [Info]),
-  if
-    ToResource /= <<>> ->
-      fcm:push(swapp_fcm, [ToResource], [{<<"data">>, [{<<"message">>, Message}]}]),
-      ?INFO_MSG("mod_fcm pushed, '~s' from '~s' to '~s'", [Message, FromUser, ToResource]),
-      ok;
-    true -> ok
+
+  case Info of
+    {selected, [SenderNick, ReceiverTokens]} ->
+      send_notification(string:split(ReceiverTokens, <<",">>, all), Message, SenderNick, Thread, FromUser);
+    _ -> ok
   end,
 
   Acc.
+
+send_notification([], Message, Title, Thread, Tag) ->
+  ?INFO_MSG("mod_fcm no tokens found", []).
+
+send_notification(Tokens, Message, Title, Thread, Tag) ->
+  fcm:push(
+    swapp_fcm,
+    Tokens,
+    [
+      {
+        <<"data">>,
+        [
+          {<<"thread">>, Thread}
+        ]
+      },
+      {
+        <<"notification">>,
+        [
+          {<<"title">>, Title},
+          {<<"body">>, Message},
+          {<<"tag">>, Tag}
+        ]
+      },
+      {<<"priority">>, <<"high">>}
+    ]
+  ),
+  ?INFO_MSG("mod_fcm sent from ~s (~s) to ~p message '~s' (~s)", [Title, Tag, Tokens, Message, Thread]).
 
 start(Host, _Opts) ->
   ?INFO_MSG("mod_fcm staring...", []),
