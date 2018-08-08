@@ -61,13 +61,13 @@ offline_message({_, #message{to = To, from = From, body = Body}} = Acc) ->
   ToUser = To#jid.luser,
   Host = To#jid.lserver,
   Message = xmpp:get_text(Body),
-  ?DEBUG("mod_fcm pushing, '~s' from '~s' to '~s'", [Message, FromUser, ToResource]),
+  ?INFO_MSG("mod_fcm pushing, '~s' from '~s' to '~s'", [Message, FromUser, ToResource]),
   Info = mod_fcm_sql:get_push_data(Host, FromUser, ToUser),
-  ?DEBUG("mod_fcm push info: '~p'", [Info]),
+  ?INFO_MSG("mod_fcm push info: '~p'", [Info]),
   if
     ToResource /= <<>> ->
       fcm:push(swapp_fcm, [ToResource], [{<<"data">>, [{<<"message">>, Message}]}]),
-      ?DEBUG("mod_fcm pushed, '~s' from '~s' to '~s'", [Message, FromUser, ToResource]),
+      ?INFO_MSG("mod_fcm pushed, '~s' from '~s' to '~s'", [Message, FromUser, ToResource]),
       ok;
     true -> ok
   end,
