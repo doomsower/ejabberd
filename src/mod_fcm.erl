@@ -54,11 +54,12 @@ adhoc_perform_action(Host, <<"unregister-push-token">>, #jid{luser = User}, XDat
     _ -> {error, xmpp:err_bad_request()}
   end.
 
-offline_message({_, #message{to = To, from = From, body = Body, thread = Thread}} = Acc) ->
+offline_message({_, #message{to = To, from = From, body = Body, thread = ThreadEl}} = Acc) ->
   FromUser = From#jid.luser,
   ToUser = To#jid.luser,
   Host = To#jid.lserver,
   Message = xmpp:get_text(Body),
+  Thread = xmpp:get_text(ThreadEl),
   Info = mod_fcm_sql:get_push_data(Host, FromUser, ToUser),
 
   ?INFO_MSG("mod_fcm push info: '~p'", [Info]),
