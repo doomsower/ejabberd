@@ -267,8 +267,6 @@ parse1([$@, $( | S], Acc, State) ->
                   [EVar]);
             string ->
                 EVar;
-            string_array ->
-                EVar;
             boolean ->
                 erl_syntax:application(
                   erl_syntax:atom(ejabberd_sql),
@@ -343,7 +341,6 @@ parse_name([$), T | S], Acc, 0, IsArg, State) ->
             $d -> integer;
             $s -> string;
             $b -> boolean;
-            $S -> string_array;
             $H when IsArg -> host;
             _ ->
                 throw({error, State#state.loc,
